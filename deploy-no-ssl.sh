@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Capsul Landing Page Deployment Script
-# This script deploys the landing page to your VDS server
+# Capsul Landing Page Deployment Script (No SSL)
+# This script deploys the landing page without SSL for initial setup
 
-echo "🚀 Deploying Capsul Landing Page..."
+echo "🚀 Deploying Capsul Landing Page (HTTP only)..."
 
 # Configuration
-DOMAIN="usechat.com"  # Replace with your actual domain
+DOMAIN="usechat.com"
 WEB_ROOT="/var/www/html"
 BACKUP_DIR="/var/www/backups"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
@@ -17,7 +17,6 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Function to print colored output
 print_status() {
     echo -e "${GREEN}[INFO]${NC} $1"
 }
@@ -67,7 +66,7 @@ chown -R www-data:www-data "$WEB_ROOT"
 chmod -R 755 "$WEB_ROOT"
 chmod 644 "$WEB_ROOT"/*.html "$WEB_ROOT"/*.css "$WEB_ROOT"/*.js
 
-# Create nginx configuration
+# Create nginx configuration (HTTP only)
 print_status "Creating nginx configuration..."
 cat > /etc/nginx/sites-available/capsul << EOF
 server {
@@ -81,7 +80,6 @@ server {
     add_header X-XSS-Protection "1; mode=block" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header Referrer-Policy "no-referrer-when-downgrade" always;
-    add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
 
     # Gzip compression
     gzip on;
@@ -139,38 +137,20 @@ else
     exit 1
 fi
 
-# Create SSL certificate with Let's Encrypt (optional)
-read -p "Do you want to set up SSL with Let's Encrypt? (y/n): " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    print_status "Setting up SSL certificate..."
-    
-    # Check if certbot is installed
-    if ! command -v certbot &> /dev/null; then
-        print_status "Installing certbot..."
-        apt update
-        apt install -y certbot python3-certbot-nginx
-    fi
-    
-    # Obtain SSL certificate
-    certbot --nginx -d $DOMAIN -d www.$DOMAIN --non-interactive --agree-tos --email admin@$DOMAIN
-    
-    if [ $? -eq 0 ]; then
-        print_status "SSL certificate installed successfully"
-    else
-        print_warning "SSL certificate installation failed. You can try again later with: certbot --nginx -d $DOMAIN"
-    fi
-fi
+# Get server IP
+SERVER_IP=$(curl -s ifconfig.me)
 
 print_status "Deployment completed successfully!"
-print_status "Your website should be available at: http://$DOMAIN"
-if [ -f /etc/letsencrypt/live/$DOMAIN/fullchain.pem ]; then
-    print_status "SSL is enabled: https://$DOMAIN"
-fi
+print_status "Your website is now accessible at:"
+echo "  - http://$SERVER_IP"
+echo "  - http://$DOMAIN (when DNS is configured)"
+echo
+print_warning "To add SSL later, run: sudo ./deploy.sh"
+print_warning "To check DNS configuration, run: ./check-dns.sh"
 
 echo
 print_status "Useful commands:"
 echo "  - View nginx logs: tail -f /var/log/nginx/access.log"
 echo "  - View error logs: tail -f /var/log/nginx/error.log"
 echo "  - Restart nginx: systemctl restart nginx"
-echo "  - Renew SSL: certbot renew" 
+echo "  - Check DNS: ./check-dns.sh" 
