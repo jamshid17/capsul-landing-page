@@ -6,7 +6,7 @@
 echo "🚀 Deploying Capsul Landing Page (HTTP only)..."
 
 # Configuration
-DOMAIN="usechat.com"
+DOMAIN="landing.usechai.com"
 WEB_ROOT="/var/www/html"
 BACKUP_DIR="/var/www/backups"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)

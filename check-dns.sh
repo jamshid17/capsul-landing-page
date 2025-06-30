@@ -6,7 +6,7 @@
 echo "🔍 Checking DNS and server configuration..."
 
 # Configuration
-DOMAIN="usechat.com"
+DOMAIN="landing.usechai.com"
 WEB_ROOT="/var/www/html"
 
 # Colors for output
@@ -144,17 +144,17 @@ print_info "=== DNS Configuration Instructions ==="
 echo
 echo "To fix DNS issues, you need to configure your domain's DNS settings:"
 echo
-echo "1. Log into your domain registrar (where you bought usechat.com)"
+echo "1. Log into your domain registrar (where you bought usechai.com)"
 echo "2. Find the DNS management section"
 echo "3. Add or update these records:"
 echo
 echo "   Type: A"
-echo "   Name: @ (or leave blank)"
+echo "   Name: landing"
 echo "   Value: $SERVER_IP"
 echo "   TTL: 300 (or default)"
 echo
 echo "   Type: A"
-echo "   Name: www"
+echo "   Name: www.landing"
 echo "   Value: $SERVER_IP"
 echo "   TTL: 300 (or default)"
 echo
